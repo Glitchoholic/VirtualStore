@@ -1,0 +1,27 @@
+@model VirtualStore.Models.Store
+
+@{ ViewData["Title"] = "Create Store"; }
+
+<link rel="stylesheet" href="~/wwwroot/css/bootstrap.min.css" />
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Create" method="post" class="mt-3">
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">Name</label>
+        <input asp-for="Name" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Address" class="form-label">Address</label>
+        <input asp-for="Address" class="form-control" required />
+    </div>
+    <div class="form-check">
+        <input asp-for="IsMain" class="form-check-input" />
+        <label asp-for="IsMain" class="form-check-label">Is Main</label>
+    </div>
+    <div class="form-check">
+        <input asp-for="IsInvoiceDirect" class="form-check-input" />
+        <label asp-for="IsInvoiceDirect" class="form-check-label">Is Invoice Direct</label>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Save</button>
+</form>

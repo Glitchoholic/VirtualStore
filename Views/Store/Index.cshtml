@@ -1,0 +1,72 @@
+@model List<VirtualStore.Models.Store>
+
+@{
+    ViewData["Title"] = "Store List";
+}
+
+<link rel="stylesheet" href="~/wwwroot/css/bootstrap.min.css" />
+
+<h2>Stores</h2>
+
+<a href="/Store/Create" class="btn btn-success mb-3">Add New Store</a>
+
+<form method="get" asp-controller="Store" asp-action="Index" class="row g-3 mb-4 align-items-end">
+    <input type="hidden" name="search" value="true" />
+    <div class="col-md-3">
+        <input type="text" name="name" value="@ViewBag.SearchName" class="form-control" placeholder="Search by Name" />
+    </div>
+    <div class="col-md-3">
+        <input type="text" name="address" value="@ViewBag.SearchAddress" class="form-control" placeholder="Search by Address" />
+    </div>
+    <div class="col-md-2">
+        <div class="form-check">
+            <input type="checkbox" name="isMain" value="true" class="form-check-input" id="isMainCheck"
+            @(ViewBag.SearchIsMain == true ? "checked" : "") />
+            <label class="form-check-label" for="isMainCheck">Main Store</label>
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="form-check">
+            <input type="checkbox" name="isInvoiceDirect" value="true" class="form-check-input" id="isInvoiceCheck"
+            @(ViewBag.SearchIsInvoiceDirect == true ? "checked" : "") />
+            <label class="form-check-label" for="isInvoiceCheck">Invoice Direct</label>
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+</form>
+
+
+
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Main</th>
+            <th>Invoice Direct</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var store in Model)
+
+        {
+            <tr>
+                <td>@store.Name</td>
+                <td>@store.Address</td>
+                <td>@(store.IsMain ? "Yes" : "No")</td>
+                <td>@(store.IsInvoiceDirect ? "Yes" : "No")</td>
+                <td>
+                    <a href="/Store/Details/@store.Id" class="btn btn-info btn-sm">Details</a>
+                    <a href="/Store/Edit/@store.Id" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="/Store/Delete/@store.Id" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

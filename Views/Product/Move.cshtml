@@ -1,0 +1,43 @@
+@model int
+@{
+    ViewData["Title"] = "Move Product";
+    var storeId = ViewBag.StoreId;
+    var fromSpaceId = ViewBag.FromSpaceId;
+    var productId = ViewBag.ProductId;
+    var spaces = ViewBag.Spaces as List<VirtualStore.Models.Space>;
+}
+<link rel="stylesheet" href="~/css/bootstrap.min.css" />
+<h2>Move Product</h2>
+<form method="post" action="/Product/Move" onsubmit="return confirmMove();">
+    <input type="hidden" name="storeId" value="@storeId" />
+    <input type="hidden" name="fromSpaceId" value="@fromSpaceId" />
+    <input type="hidden" name="productId" value="@productId" />
+    <div class="mb-3">
+        <label for="toSpaceId" class="form-label">Target Space</label>
+        <select name="toSpaceId" class="form-select">
+            @foreach (var space in spaces)
+            {
+                <option value="@space.Id">@space.Name</option>
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Move</button>
+</form>
+
+@section Scripts {
+    <script>
+        function confirmMove() {
+            return confirm("Are you sure you want to move this product?");
+        }
+    </script>
+}
+@if (TempData["PopupMessage"] != null)
+
+{
+    <script>
+
+        alert("@TempData["PopupMessage"]");
+
+    </script>
+
+}

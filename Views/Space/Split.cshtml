@@ -1,0 +1,16 @@
+@{
+    ViewData["Title"] = "Split Space";
+    var storeId = ViewBag.StoreId;
+    var spaceId = ViewBag.SpaceId;
+}
+<link rel="stylesheet" href="~/wwwroot/css/bootstrap.min.css" />
+<h2>Split Space</h2>
+<form method="post" action="/Space/Split">
+    <input type="hidden" name="storeId" value="@storeId" />
+    <input type="hidden" name="spaceId" value="@spaceId" />
+    <div class="mb-3">
+        <label>Number of new spaces</label>
+        <input type="number" name="count" min="2" value="2" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-warning">Split</button>
+</form>

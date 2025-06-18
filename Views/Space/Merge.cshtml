@@ -1,0 +1,52 @@
+@{
+    ViewData["Title"] = "Merge Spaces";
+    var storeId = ViewBag.StoreId;
+    var spaceId1 = ViewBag.SpaceId1;
+    var spaces = ViewBag.Spaces as List<VirtualStore.Models.Space>;
+    var current = spaces?.FirstOrDefault(s => s.Id == spaceId1);
+}
+
+<link rel="stylesheet" href="~/wwwroot/css/bootstrap.min.css" />
+
+<h2>Merge Space: @current?.Name</h2>
+
+<form method="post" action="/Space/Merge" onsubmit="return validateMerge();" onsubmit="return confirmMove();">
+    <input type="hidden" name="storeId" value="@storeId" />
+    <input type="hidden" name="spaceId1" value="@spaceId1" />
+
+    <div class="mb-3">
+        <label>Target Space to Merge Into "@current?.Name"</label>
+        <select id="spaceId2" name="spaceId2" class="form-select">
+            @foreach (var space in spaces.Where(s => s.Id != spaceId1))
+            {
+                <option value="@space.Id">@space.Name</option>
+            }
+        </select>
+    </div>
+
+    <div id="errorMsg" class="text-danger fw-bold mb-2" style="display: none;">
+        Cannot merge a space with itself.
+    </div>
+
+    <button type="submit" class="btn btn-danger">Merge</button>
+</form>
+
+<script>
+    function validateMerge() {
+        const id1 = "@spaceId1";
+        const id2 = document.getElementById("spaceId2").value;
+        const errorMsg = document.getElementById("errorMsg");
+
+        if (id1 === id2) {
+            errorMsg.style.display = "block";
+            return false;
+        }
+
+        errorMsg.style.display = "none";
+        return true;
+        }
+
+    function confirmMove() {
+                return confirm("Are you sure you want to merge this space?");
+        }
+</script>
