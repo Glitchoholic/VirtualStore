@@ -51,29 +51,21 @@
         {
             columns.Add(m => m.Name)
             .Titled("Name")
-            .Css("text-start")
-            .Filterable(true)
-            .Sortable(true);
+            .Css("text-start");
 
             columns.Add(m => m.Address)
             .Titled("Address")
-            .Css("text-start")
-            .Filterable(true)
-            .Sortable(true);
+            .Css("text-start");
 
             columns.Add(m => m.IsMain)
             .Titled("Main")
             .RenderedAs(x => x.IsMain ? "Yes" : "No")
-            .Css("text-center")
-            .Filterable(true)
-            .Sortable(true);
+            .Css("text-center");
 
             columns.Add(m => m.IsInvoiceDirect)
             .Titled("Invoice Direct")
             .RenderedAs(x => x.IsInvoiceDirect ? "Yes" : "No")
-            .Css("text-center")
-            .Filterable(true)
-            .Sortable(true);
+            .Css("text-center");
 
             columns.Add()
             .Titled("Actions")
