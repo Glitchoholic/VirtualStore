@@ -1,16 +1,22 @@
 @model VirtualStore.Models.Space
+
 @{
     ViewData["Title"] = "Edit Space";
     var storeId = ViewBag.StoreId;
 }
-<link rel="stylesheet" href="~/wwwroot/css/bootstrap.min.css" />
-<h2>Edit Space</h2>
+
+<h2>@ViewData["Title"]</h2>
+
 <form asp-action="Edit" method="post">
     <input type="hidden" name="storeId" value="@storeId" />
     <input type="hidden" asp-for="Id" />
+
     <div class="mb-3">
         <label asp-for="Name" class="form-label">Name</label>
         <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
     </div>
+
     <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-controller="Store" asp-action="Details" asp-route-id="@storeId" class="btn btn-secondary ms-2">Cancel</a>
 </form>

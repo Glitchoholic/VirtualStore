@@ -6,17 +6,17 @@
     var current = spaces?.FirstOrDefault(s => s.Id == spaceId1);
 }
 
-<link rel="stylesheet" href="~/wwwroot/css/bootstrap.min.css" />
-
 <h2>Merge Space: @current?.Name</h2>
 
-<form method="post" action="/Space/Merge" onsubmit="return validateMerge();" onsubmit="return confirmMove();">
+<form method="post" action="/Space/Merge" onsubmit="return handleMerge();">
     <input type="hidden" name="storeId" value="@storeId" />
     <input type="hidden" name="spaceId1" value="@spaceId1" />
 
     <div class="mb-3">
-        <label>Target Space to Merge Into "@current?.Name"</label>
-        <select id="spaceId2" name="spaceId2" class="form-select">
+        <label for="spaceId2" class="form-label">
+            Select a space to merge <strong>into</strong> "@current?.Name"
+        </label>
+        <select id="spaceId2" name="spaceId2" class="form-select" required>
             @foreach (var space in spaces.Where(s => s.Id != spaceId1))
             {
                 <option value="@space.Id">@space.Name</option>
@@ -24,15 +24,16 @@
         </select>
     </div>
 
-    <div id="errorMsg" class="text-danger fw-bold mb-2" style="display: none;">
+    <div id="errorMsg" class="text-danger fw-bold mb-3" style="display: none;">
         Cannot merge a space with itself.
     </div>
 
     <button type="submit" class="btn btn-danger">Merge</button>
+    <a asp-controller="Store" asp-action="Details" asp-route-id="@storeId" class="btn btn-secondary ms-2">Cancel</a>
 </form>
 
 <script>
-    function validateMerge() {
+    function handleMerge() {
         const id1 = "@spaceId1";
         const id2 = document.getElementById("spaceId2").value;
         const errorMsg = document.getElementById("errorMsg");
@@ -43,10 +44,6 @@
         }
 
         errorMsg.style.display = "none";
-        return true;
-        }
-
-    function confirmMove() {
-                return confirm("Are you sure you want to merge this space?");
-        }
+        return confirm("Are you sure you want to merge these spaces?");
+    }
 </script>

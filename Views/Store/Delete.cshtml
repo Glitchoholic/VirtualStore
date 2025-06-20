@@ -1,20 +1,20 @@
 @model VirtualStore.Models.Store
 
-@{ ViewData["Title"] = "Delete Store"; }
-
-<link rel="stylesheet" href="~/css/bootstrap.min.css" />
+@{
+    ViewData["Title"] = "Delete Store";
+}
 
 <h2>Are you sure you want to delete this store?</h2>
 
-<div>
+<div class="mb-3">
     <h4>@Model.Name</h4>
-    <p>@Model.Address</p>
+    <p><strong>Address:</strong> @Model.Address</p>
+    <p><strong>Main:</strong> @(Model.IsMain ? "Yes" : "No")</p>
+    <p><strong>Invoice Direct:</strong> @(Model.IsInvoiceDirect ? "Yes" : "No")</p>
 </div>
 
 <form asp-action="DeleteConfirmed" method="post">
     <input type="hidden" asp-for="Id" />
-    <button type="submit" class="btn btn-danger">Delete</button>
-    <a href="/Store/Index" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn-danger me-2">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
 </form>
-
-

@@ -4,14 +4,13 @@
     ViewData["Title"] = "Store Details";
 }
 
-<link rel="stylesheet" href="~/wwwroot/css/bootstrap.min.css" />
-
 <h2>@Model.Name - Details</h2>
 
 <p><strong>Address:</strong> @Model.Address</p>
-<p><strong>Main:</strong> @Model.IsMain</p>
-<p><strong>Invoice Direct:</strong> @Model.IsInvoiceDirect</p>
+<p><strong>Main:</strong> @(Model.IsMain ? "Yes" : "No")</p>
+<p><strong>Invoice Direct:</strong> @(Model.IsInvoiceDirect ? "Yes" : "No")</p>
 
+<a href="/Store/Index" class="btn btn-secondary mb-4">Back to Store List</a>
 
 @foreach (var space in Model.Spaces)
 {
@@ -19,7 +18,7 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">@space.Name</h5>
             <div class="dropdown">
-                <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
                     Actions
                 </button>
                 <ul class="dropdown-menu">
@@ -27,10 +26,12 @@
                     <li><a class="dropdown-item" href="/Space/Split?storeId=@Model.Id&spaceId=@space.Id">Split Space</a></li>
                     <li><a class="dropdown-item" href="/Product/Create?storeId=@Model.Id&spaceId=@space.Id">Add Product</a></li>
                     <li><a class="dropdown-item" href="/Space/Merge?storeId=@Model.Id&spaceId1=@space.Id">Merge With...</a></li>
-                    <li><a class="dropdown-item text-danger" href="/Space/Delete?storeId=@Model.Id&spaceId=@space.Id">Delete Space</a></li>
+                    <li>
+                        <a class="dropdown-item text-danger" href="/Space/Delete?storeId=@Model.Id&spaceId=@space.Id"
+                           onclick="return confirm('Are you sure you want to delete this space?');">Delete Space</a>
+                    </li>
                 </ul>
             </div>
-
         </div>
 
         <div class="card-body">
@@ -52,8 +53,8 @@
                                 <td>@product.Count</td>
                                 <td>
                                     <a class="btn btn-sm btn-warning" href="/Product/Edit?storeId=@Model.Id&spaceId=@space.Id&id=@product.Id">Edit</a>
-                                    <a class="btn btn-sm btn-danger" href="/Product/Delete?storeId=@Model.Id&spaceId=@space.Id&id=@product.Id" 
-                                    onclick="return confirm('Are you sure you want to delete this product?');">Delete</a>
+                                    <a class="btn btn-sm btn-danger" href="/Product/Delete?storeId=@Model.Id&spaceId=@space.Id&id=@product.Id"
+                                       onclick="return confirm('Are you sure you want to delete this product?');">Delete</a>
                                     <a class="btn btn-sm btn-secondary" href="/Product/Move?storeId=@Model.Id&fromSpaceId=@space.Id&productId=@product.Id">Move</a>
                                 </td>
                             </tr>
@@ -67,16 +68,11 @@
             }
         </div>
     </div>
-    @if (TempData["PopupMessage"] != null)
-
-    {
-        <script>
-           
-                alert("@TempData["PopupMessage"]");
-            
-        </script>
-
-    }
-
 }
 
+@if (TempData["PopupMessage"] != null)
+{
+    <script>
+        alert("@TempData["PopupMessage"]");
+    </script>
+}

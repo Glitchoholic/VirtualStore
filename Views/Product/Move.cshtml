@@ -1,4 +1,5 @@
 @model int
+
 @{
     ViewData["Title"] = "Move Product";
     var storeId = ViewBag.StoreId;
@@ -6,38 +7,44 @@
     var productId = ViewBag.ProductId;
     var spaces = ViewBag.Spaces as List<VirtualStore.Models.Space>;
 }
-<link rel="stylesheet" href="~/css/bootstrap.min.css" />
-<h2>Move Product</h2>
-<form method="post" action="/Product/Move" onsubmit="return confirmMove();">
+
+<h2>@ViewData["Title"]</h2>
+
+<form method="post" asp-action="Move" asp-controller="Product" onsubmit="return confirmMove();">
     <input type="hidden" name="storeId" value="@storeId" />
     <input type="hidden" name="fromSpaceId" value="@fromSpaceId" />
     <input type="hidden" name="productId" value="@productId" />
+
     <div class="mb-3">
-        <label for="toSpaceId" class="form-label">Target Space</label>
-        <select name="toSpaceId" class="form-select">
+        <label for="toSpaceId" class="form-label">Select Target Space</label>
+        <select id="toSpaceId" name="toSpaceId" class="form-select" required>
             @foreach (var space in spaces)
             {
                 <option value="@space.Id">@space.Name</option>
             }
         </select>
     </div>
+
     <button type="submit" class="btn btn-primary">Move</button>
+    <a asp-controller="Store" asp-action="Details" asp-route-id="@storeId" class="btn btn-secondary ms-2">Cancel</a>
 </form>
 
 @section Scripts {
     <script>
         function confirmMove() {
+            const selected = document.getElementById("toSpaceId").value;
+            if (!selected) {
+                alert("Please select a space to move the product into.");
+                return false;
+            }
             return confirm("Are you sure you want to move this product?");
         }
     </script>
 }
-@if (TempData["PopupMessage"] != null)
 
+@if (TempData["PopupMessage"] != null)
 {
     <script>
-
         alert("@TempData["PopupMessage"]");
-
     </script>
-
 }

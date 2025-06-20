@@ -2,6 +2,7 @@
 
 namespace VirtualStore.Models
 {
+    // Store.cs
     public class Store
     {
         public int Id { get; set; }
@@ -9,7 +10,8 @@ namespace VirtualStore.Models
         public string Address { get; set; }
         public bool IsMain { get; set; }
         public bool IsInvoiceDirect { get; set; }
-        public List<Space> Spaces { get; set; }
 
+        public List<Space> Spaces { get; set; } = new List<Space>();
     }
+
 }

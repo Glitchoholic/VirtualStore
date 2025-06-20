@@ -3,14 +3,18 @@
     var storeId = ViewBag.StoreId;
     var spaceId = ViewBag.SpaceId;
 }
-<link rel="stylesheet" href="~/wwwroot/css/bootstrap.min.css" />
-<h2>Split Space</h2>
-<form method="post" action="/Space/Split">
+
+<h2>@ViewData["Title"]</h2>
+
+<form method="post" asp-controller="Space" asp-action="Split">
     <input type="hidden" name="storeId" value="@storeId" />
     <input type="hidden" name="spaceId" value="@spaceId" />
+
     <div class="mb-3">
-        <label>Number of new spaces</label>
-        <input type="number" name="count" min="2" value="2" class="form-control" />
+        <label for="count" class="form-label">Number of new spaces</label>
+        <input type="number" id="count" name="count" min="2" value="2" class="form-control" required />
     </div>
+
     <button type="submit" class="btn btn-warning">Split</button>
+    <a asp-controller="Store" asp-action="Details" asp-route-id="@storeId" class="btn btn-secondary ms-2">Cancel</a>
 </form>

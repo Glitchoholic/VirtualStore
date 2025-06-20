@@ -1,10 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using VirtualStore.Data;
 using VirtualStore.Models;
+using static VirtualStore.Data.AppDbContext;
 
 namespace VirtualStore.Controllers
 {
     public class ProductController : Controller
     {
+        private readonly AppDbContext _context;
+
+        public ProductController(AppDbContext context)
+        {
+            _context = context;
+        }
+
         public IActionResult Create(int storeId, int spaceId)
         {
             ViewBag.StoreId = storeId;
@@ -15,20 +26,29 @@ namespace VirtualStore.Controllers
         [HttpPost]
         public IActionResult Create(int storeId, int spaceId, Product product)
         {
-            var space = FakeDatabase.Stores.FirstOrDefault(s => s.Id == storeId)
-                        ?.Spaces.FirstOrDefault(sp => sp.Id == spaceId);
+            var space = _context.Spaces
+                .Include(sp => sp.Products)
+                .FirstOrDefault(sp => sp.Id == spaceId);
 
-            product.Id = FakeDatabase.Stores.SelectMany(s => s.Spaces).SelectMany(p => p.Products).Max(p => p.Id) + 1;
-            space?.Products.Add(product);
+            if (space != null && ModelState.IsValid)
+            {
+                product.Id = _context.Products.Any() ? _context.Products.Max(p => p.Id) + 1 : 1;
+
+                product.SpaceId = spaceId;
+
+                _context.Products.Add(product);   
+                space.Products.Add(product);      
+
+                _context.SaveChanges();
+            }
 
             return RedirectToAction("Details", "Store", new { id = storeId });
         }
 
         public IActionResult Edit(int storeId, int spaceId, int id)
         {
-            var product = FakeDatabase.Stores.FirstOrDefault(s => s.Id == storeId)
-                          ?.Spaces.FirstOrDefault(sp => sp.Id == spaceId)
-                          ?.Products.FirstOrDefault(p => p.Id == id);
+            var product = _context.Products.FirstOrDefault(p => p.Id == id);
+            if (product == null) return NotFound();
 
             ViewBag.StoreId = storeId;
             ViewBag.SpaceId = spaceId;
@@ -38,14 +58,15 @@ namespace VirtualStore.Controllers
         [HttpPost]
         public IActionResult Edit(int storeId, int spaceId, Product product)
         {
-            var prod = FakeDatabase.Stores.FirstOrDefault(s => s.Id == storeId)
-                       ?.Spaces.FirstOrDefault(sp => sp.Id == spaceId)
-                       ?.Products.FirstOrDefault(p => p.Id == product.Id);
+            if (!ModelState.IsValid)
+                return View(product);
 
-            if (prod != null)
+            var existing = _context.Products.FirstOrDefault(p => p.Id == product.Id);
+            if (existing != null)
             {
-                prod.Name = product.Name;
-                prod.Count = product.Count;
+                existing.Name = product.Name;
+                existing.Count = product.Count;
+                _context.SaveChanges();
             }
 
             return RedirectToAction("Details", "Store", new { id = storeId });
@@ -53,11 +74,17 @@ namespace VirtualStore.Controllers
 
         public IActionResult Delete(int storeId, int spaceId, int id)
         {
-            var space = FakeDatabase.Stores.FirstOrDefault(s => s.Id == storeId)
-                        ?.Spaces.FirstOrDefault(sp => sp.Id == spaceId);
+            var space = _context.Spaces
+                .Include(sp => sp.Products)
+                .FirstOrDefault(sp => sp.Id == spaceId);
 
             var product = space?.Products.FirstOrDefault(p => p.Id == id);
-            if (product != null) space.Products.Remove(product);
+            if (product != null)
+            {
+                space.Products.Remove(product);
+                _context.Products.Remove(product); 
+                _context.SaveChanges();
+            }
 
             return RedirectToAction("Details", "Store", new { id = storeId });
         }
@@ -65,12 +92,15 @@ namespace VirtualStore.Controllers
         [HttpGet]
         public IActionResult Move(int storeId, int fromSpaceId, int productId)
         {
-            var store = FakeDatabase.Stores.FirstOrDefault(s => s.Id == storeId);
-            var spaces = store?.Spaces
-                .Where(sp => sp.Id != fromSpaceId) // Exclude current space
-                .ToList();
+            var store = _context.Stores
+                .Include(s => s.Spaces)
+                .ThenInclude(sp => sp.Products)
+                .FirstOrDefault(s => s.Id == storeId);
 
-            if (store == null || spaces == null || spaces.Count == 0)
+            if (store == null) return NotFound();
+
+            var spaces = store.Spaces.Where(sp => sp.Id != fromSpaceId).ToList();
+            if (!spaces.Any())
             {
                 TempData["PopupMessage"] = "You only have one space in the store.";
                 return RedirectToAction("Details", "Store", new { id = storeId });
@@ -81,22 +111,33 @@ namespace VirtualStore.Controllers
             ViewBag.ProductId = productId;
             ViewBag.Spaces = spaces;
 
-            return View(); 
+            return View();
         }
-
 
         [HttpPost]
         public IActionResult Move(int storeId, int productId, int fromSpaceId, int toSpaceId)
         {
-            var store = FakeDatabase.Stores.FirstOrDefault(s => s.Id == storeId);
-            var from = store?.Spaces.FirstOrDefault(sp => sp.Id == fromSpaceId);
-            var to = store?.Spaces.FirstOrDefault(sp => sp.Id == toSpaceId);
-            var product = from?.Products.FirstOrDefault(p => p.Id == productId);
-
-            if (product != null && to != null)
+            if (fromSpaceId == toSpaceId)
             {
-                from.Products.Remove(product);
-                to.Products.Add(product);
+                TempData["PopupMessage"] = "Cannot move product to the same space.";
+                return RedirectToAction("Details", "Store", new { id = storeId });
+            }
+
+            var fromSpace = _context.Spaces
+                .Include(sp => sp.Products)
+                .FirstOrDefault(sp => sp.Id == fromSpaceId);
+
+            var toSpace = _context.Spaces
+                .Include(sp => sp.Products)
+                .FirstOrDefault(sp => sp.Id == toSpaceId);
+
+            var product = fromSpace?.Products.FirstOrDefault(p => p.Id == productId);
+
+            if (fromSpace != null && toSpace != null && product != null)
+            {
+                fromSpace.Products.Remove(product);
+                toSpace.Products.Add(product);
+                _context.SaveChanges();
             }
 
             return RedirectToAction("Details", "Store", new { id = storeId });
